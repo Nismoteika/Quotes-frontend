@@ -10,7 +10,7 @@
           :date="quote.created_at"
         />
       </v-row>
-      <v-row>
+      <v-row justify="center">
         <v-pagination
           v-model="currentPage"
           :length="totalQuotes"
@@ -35,14 +35,23 @@ export default {
     totalQuotes: 1,
   }),
   mounted() {
-    fetch(`${apiBase.url}/quotes`)
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        this.quotes = data.data;
-        this.currentPage = data.current_page; 
-        this.totalQuotes = data.last_page;
-      });
+    this.getQuotes();
+  },
+  methods: {
+    getQuotes: function (page = 1) {
+      fetch(`${apiBase.url}/quotes?page=${page}`)
+        .then((response) => response.json())
+        .then((data) => {
+          this.quotes = data.data;
+          this.currentPage = data.current_page; 
+          this.totalQuotes = data.last_page;
+        });
+    },
+  },
+  watch: {
+    currentPage: function () {
+      this.getQuotes(this.currentPage);
+    },
   },
 };
 </script>
