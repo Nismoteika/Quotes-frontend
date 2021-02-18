@@ -10,6 +10,19 @@
         </v-card-title>
 
         <v-card-text>
+          <v-alert
+            v-if="alertError"
+            type="error">
+            Ошибка добавления цитаты
+          </v-alert>
+          <v-alert
+            v-if="alertSuccess"
+            type="success">
+            Цитата успешно добавлена
+          </v-alert>
+        </v-card-text>
+
+        <v-card-text>
           <v-text-field
               v-model="author"
               :rules="authorRules"
@@ -21,6 +34,7 @@
             solo
             name="text"
             v-model="text"
+            :rules="textRules"
             label="Текст цитаты"
             required
           ></v-textarea>
@@ -28,6 +42,7 @@
           <v-combobox
           v-model="tagsSelected"
           :items="tagsAvailable"
+          :rules="tagsRules"
           label="Тэги"
           multiple
           chips
@@ -61,10 +76,20 @@ export default {
   data() {
     return ({
       activeModal: true,
+      alertSuccess: false,
+      alertError: false,
       author: '',
       authorRules: [
         (v) => !!v || 'Поле "автор" обязательно',
         (v) => (v && v.length >= 2) || 'Имя автора должно быть больше чем (или равно) 2 символа',
+      ],
+      textRules: [
+        (v) => !!v || 'Поле "текст" обязательно',
+        (v) => (v && v.length >= 5) || 'Текст должнен быть больше чем (или равно) 5 символа',
+      ],
+      tagsRules: [
+        (v) => (v && v.length >= 1) || 'Минимум 1 тэг нужно указать',
+        (v) => (v && v.length <= 3) || 'Максимум 3 тэг можно указать',
       ],
       text: '',
       tagsSelected: [],
@@ -83,18 +108,46 @@ export default {
     });
   },
   methods: {
-    sendForm: function sendForm() {
+    viewAlertError: function (time = 1000) {
+      this.alertError = true;
+      setTimeout(() => {
+        this.alertError = false;
+      }, time);
+    },
+    viewAlertSuccess: function (time = 1000) {
+      this.alertSuccess = true;
+      setTimeout(() => {
+        this.alertSuccess = false;
+      }, time);
+    },
+    sendForm: function () {
       const arrIdsTag = [];
       this.tagsSelected.forEach((item) => {
         const id = item.split('.');
         arrIdsTag.push(id[0]);
       });
+
+      if (arrIdsTag >= 3 && arrIdsTag <= 1) {
+        this.viewAlertError(3000);
+        return;
+      }
+
+      if (this.author.length < 2) {
+        this.viewAlertError(3000);
+        return;
+      }
+
+      if (this.text.length < 5) {
+        this.viewAlertError(3000);
+        return;
+      }
+
       const quotePayload = {
         'author': this.author,
         'text': this.text,
         'tags': arrIdsTag,
       };
-      console.log(arrIdsTag);
+      
       fetch(`${apiBase.url}/quotes`,
         {
           headers: {
@@ -106,9 +159,16 @@ export default {
         })
         .then((response) => response.json())
         .then((data) => {
-          console.log(data);
+          if (data.status === 'success') {
+            this.alertSuccess = true;
+            setTimeout(() => {
+              this.$emit('close');
+              this.$router.go();
+            }, 1000);
+          } else {
+            this.viewAlertByTime();
+          }
         });
-      this.$emit('close');
     },
   },
 };
