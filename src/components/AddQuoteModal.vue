@@ -1,6 +1,7 @@
 <template>
   <v-dialog
       v-model="activeModal"
+      transition="dialog-bottom-transition"
       width="500"
     >
       <v-card>
