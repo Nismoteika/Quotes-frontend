@@ -5,9 +5,7 @@
         <Quote
           v-for="quote of quotes"
           v-bind:key="quote.id"
-          :author="quote.author"
-          :text="quote.text"
-          :date="quote.created_at"
+          :quote="quote"
         />
       </v-row>
       <v-row justify="center">
