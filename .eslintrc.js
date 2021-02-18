@@ -16,5 +16,6 @@ module.exports = {
     'quote-props': 'off',
     'object-shorthand': 'off',
     'no-trailing-spaces': 'off',
+    'func-names': 'off',
   },
 };
