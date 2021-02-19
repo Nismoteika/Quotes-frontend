@@ -1,4 +1,4 @@
-# frontend
+# Quotes frontend
 
 ## Project setup
 ```
@@ -20,5 +20,7 @@ yarn build
 yarn lint
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### Deploy
+1. `yarn build`
+2. send to server dist/* -> /public/
+3. send to server views -> /resources/
